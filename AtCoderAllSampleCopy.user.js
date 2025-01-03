@@ -7,6 +7,8 @@
 // @match        https://atcoder.jp/contests/*/tasks/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=atcoder.jp
 // @grant        GM_setClipboard
+// @updateURL    https://github.com/A0ikun1818/AtCoderAllSampleCopy/raw/main/AtCoderAllSampleCopy.user.js
+// @downloadURL    https://github.com/A0ikun1818/AtCoderAllSampleCopy/raw/main/AtCoderAllSampleCopy.user.js
 // ==/UserScript==
 
 (function() {
