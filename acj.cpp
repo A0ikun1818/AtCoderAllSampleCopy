@@ -4,12 +4,19 @@
 #include <stdlib.h>
 #include <time.h>
 #include <chrono>
+#include <filesystem>
 using namespace std;
 enum Mode {
 	SampleMode = 1,
 	InputMode = 11,
 	OutputMode = 12
 };
+void Replace(std::string& stringreplace, const std::string& origin, const std::string& dest)
+{
+    size_t pos = stringreplace.find(origin);  // 置換したい文字列が登場する位置を検索する
+    size_t len = origin.length();    // 置換したい文字列の長さ
+    stringreplace.replace(pos, len, dest);  // 置換
+}// https://learningprog.com/cpp-replace/
 int main()
 {
 	const string TIME_LIMIT = "2.2";
@@ -77,6 +84,7 @@ int main()
 						// 間違い
 						judgeRes = 1;
 						judgeResStr = "WA";
+						system("paste check.txt out.txt > diff.txt");
 					}
 				}
 
@@ -90,6 +98,31 @@ int main()
 
 				// 最後にまとめて出力する
 				finalRes += "Sample " + sampleNum + ": " + judgeResStr + " (" + to_string(runRes) + ", " + to_string(durationTime) + "ms)\n";
+				if(filesystem::is_regular_file("diff.txt")){
+					ifstream diffFile("diff.txt");
+					if(!diffFile.is_open()){
+						finalRes += "diff.txt open error\n";
+					}else{
+						string line;
+						while(getline(diffFile, line)){
+							if(line.find('.') != string::npos){
+								int slashPos = line.find('\t');
+								if(slashPos == string::npos){
+									line = "line slash error\n";
+								}else{
+									string userOutput = line.substr(0, slashPos);
+									string sampleOutput = line.substr(slashPos+1);
+									int minlen = min(userOutput.size(), sampleOutput.size())-1;
+									if(userOutput.substr(0, minlen) == sampleOutput.substr(0, minlen)){
+										line += "\tNear \033[32mAC\033[m?";
+									}
+								}
+							}
+							finalRes += line + "\n";
+						}
+						diffFile.close();
+					}
+				}
 			}
 			if (s == "$ === END === $") {
 				// 処理終了
@@ -97,12 +130,14 @@ int main()
 					remove("in.txt");
 					remove("out.txt");
 					remove("check.txt");
+					remove("diff.txt");
 				#endif
 				break;
 			}else{
 				remove("in.txt");
 				remove("out.txt");
 				remove("check.txt");
+				remove("diff.txt");
 			}
 			inputStr = "";
 			outputStr = "";
