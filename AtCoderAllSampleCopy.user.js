@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder All Sample Copy
 // @namespace    http://tampermonkey.net/
-// @version      2025-01-03
+// @version      2025-01-14
 // @description  AtCoderのテストケースをすべてコピーするボタンを配置する
 // @author       A0ikun1818
 // @match        https://atcoder.jp/contests/*/tasks/*
@@ -13,7 +13,7 @@
 
 (function() {
     'use strict';
-    const LIMIT_TIME = 2.0;
+    const LIMIT_TIME = 2000.0;
 
     // Your code here...
     const startTime = new Date().getTime();
@@ -21,6 +21,7 @@
     while(document.querySelector('pre[id]')==null){
         let nowTime = new Date().getTime();
         if(nowTime - startTime > LIMIT_TIME){
+            console.log("All Sample Copy: Timeout");
             ng = true;
             break;
         }
@@ -40,7 +41,9 @@
         copyAllButton.setAttribute('data-original-title', 'Copied!');
 
         copyAllButton.addEventListener('click', {handleEvent: sampleAllCopy});
-        document.querySelector('div.io-style > div.part > section > h3').appendChild(copyAllButton);
+        document.querySelector('span.lang-ja > div.io-style > div.part > section > h3').appendChild(copyAllButton);
+
+        console.log("All Sample Copy: Complete");
     }
     function sampleAllCopy(){
         let allSamples = document.querySelectorAll('span.lang-ja pre[id]');
