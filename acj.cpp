@@ -17,9 +17,20 @@ void Replace(std::string& stringreplace, const std::string& origin, const std::s
     size_t len = origin.length();    // 置換したい文字列の長さ
     stringreplace.replace(pos, len, dest);  // 置換
 }// https://learningprog.com/cpp-replace/
-int main()
+int main(int argc, char *argv[])
 {
-	const string TIME_LIMIT = "2.2";
+	string TIMEOUT_BORDER = "2.2";
+	long double TIME_LIMIT = 2000.0;
+	if(argc>=2){
+		long double TL = 2.0;
+		try{
+			TL = stold(argv[1]);
+		}catch(exception e){
+			TL = 2.0;
+		}
+		TIMEOUT_BORDER = to_string(TL*1.1);
+		TIME_LIMIT = TL*1000;
+	}
 
 	string s;
 	int mode = 0;
@@ -44,7 +55,7 @@ int main()
 				inFile.close();
 				outFile.close();
 
-				string cmd = "timeout " + TIME_LIMIT + " ./a.out < in.txt > check.txt 2> /dev/null";
+				string cmd = "timeout " + TIMEOUT_BORDER + " ./a.out < in.txt > check.txt 2> /dev/null";
 				
 				// 実行前の時刻
 				auto startTime = chrono::high_resolution_clock::now();
@@ -61,7 +72,7 @@ int main()
 				int judgeRes = -1;
 				string judgeResStr = "WJ";
 				
-				if (durationTime > 2000) {
+				if (durationTime > TIME_LIMIT) {
 					// 実行時間制限超過
 					judgeRes = 1;
 					judgeResStr = "TLE";
@@ -97,11 +108,12 @@ int main()
 				}
 
 				// 最後にまとめて出力する
-				finalRes += "Sample " + sampleNum + ": " + judgeResStr + " (" + to_string(runRes) + ", " + to_string(durationTime) + "ms)\n";
+				string res = "";
+				res += "Sample " + sampleNum + ": " + judgeResStr + " (" + to_string(runRes) + ", " + to_string(durationTime) + "ms)\n";
 				if(filesystem::is_regular_file("diff.txt")){
 					ifstream diffFile("diff.txt");
 					if(!diffFile.is_open()){
-						finalRes += "diff.txt open error\n";
+						res += "diff.txt open error\n";
 					}else{
 						string line;
 						while(getline(diffFile, line)){
@@ -118,11 +130,17 @@ int main()
 									}
 								}
 							}
-							finalRes += line + "\n";
+							res += line + "\n";
 						}
 						diffFile.close();
 					}
 				}
+				//個別で出力
+				cout << string(30, '=') << endl;
+				cout << res;
+
+				//それとは別に、最後にまとめて出力する用
+				finalRes += res;
 			}
 			if (s == "$ === END === $") {
 				// 処理終了
@@ -161,6 +179,7 @@ int main()
 			}
 		}
 	}
+	cout << string(30, '=') << endl;
 	cout << finalRes;
 	return 0;
 }
